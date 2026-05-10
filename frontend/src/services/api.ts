@@ -33,7 +33,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000/api", // 🔴 adjust ONLY if backend differs
+  baseURL: "http://localhost:8000", // 🔴 adjust ONLY if backend differs
 headers: {
     "Content-Type": "application/json",
 },

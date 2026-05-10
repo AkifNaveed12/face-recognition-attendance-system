@@ -37,3 +37,8 @@ export async function getTodayAttendance(): Promise<TodayAttendance> {
     const res = await api.get("/attendance/today");
     return res.data;
 }
+
+export async function getAttendanceHistory(): Promise<AttendanceRecord[]> {
+    const res = await api.get("/attendance/history");
+    return res.data;
+}

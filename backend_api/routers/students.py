@@ -6,6 +6,10 @@ from PIL import Image
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from backend.database import get_connection
 import sqlite3
+import os
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CACHE_PATH = os.path.join(ROOT_DIR, "attendance_service", "students_cache.pkl")
 
 router = APIRouter(
     prefix="/students",
@@ -61,7 +65,7 @@ async def register_student(
         conn.close()
 
         # ✅ WRITE CLEAN CACHE ENTRY
-        os.makedirs("attendance_service", exist_ok=True)
+        os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 
         cache = []
         if os.path.exists(CACHE_PATH):
@@ -85,6 +89,7 @@ async def register_student(
     except HTTPException:
         raise
     except Exception as e:
+        print(f"ERROR: Student registration failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

@@ -1,173 +1,8 @@
-// import { useEffect, useState } from "react";
-// import { getAllStudents } from "../../services/students";
-// import { getTodayAttendance } from "../../services/attendance.service";
-// import type { TodayAttendance } from "../../services/attendance.service";
-// import {
-//     PieChart,
-//     Pie,
-//     Cell,
-//     ResponsiveContainer,
-//     BarChart,
-//     Bar,
-//     XAxis,
-//     Tooltip
-// } from "recharts";
-
-// export default function AdminDashboard() {
-//     const [totalStudents, setTotalStudents] = useState(0);
-//     const [attendance, setAttendance] = useState<TodayAttendance | null>(null);
-//     const [loading, setLoading] = useState(true);
-
-//     async function loadData() {
-//         try {
-//             const [students, today] = await Promise.all([
-//                 getAllStudents(),
-//                 getTodayAttendance()
-//             ]);
-
-//             setTotalStudents(students.length);
-//             setAttendance(today);
-//         } catch (err) {
-//             console.error("Dashboard load failed", err);
-//         } finally {
-//             setLoading(false);
-//         }
-//     }
-
-//     useEffect(() => {
-//         loadData();
-
-//         const interval = setInterval(loadData, 5000); // auto refresh
-//         return () => clearInterval(interval);
-//     }, []);
-
-//     if (loading || !attendance) {
-//         return <p className="text-gray-400">Loading dashboard...</p>;
-//     }
-
-//     const present = attendance.total_present;
-//     const absent = totalStudents - present;
-
-//     /* ===== CHART DATA (ADDED) ===== */
-//     const pieData = [
-//         { name: "Present", value: present },
-//         { name: "Absent", value: absent }
-//     ];
-
-//     const COLORS = ["#22c55e", "#ef4444"];
-
-//     return (
-//         <div className="space-y-6">
-//             <h1 className="text-2xl font-semibold">Dashboard Overview</h1>
-
-//             {/* ===== STAT CARDS ===== */}
-//             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-//                 <StatCard
-//                     title="Total Students"
-//                     value={totalStudents}
-//                     color="text-green-400"
-//                 />
-
-//                 <StatCard
-//                     title="Today Present"
-//                     value={present}
-//                     color="text-green-400"
-//                 />
-
-//                 <StatCard
-//                     title="Absent"
-//                     value={absent}
-//                     color="text-red-400"
-//                 />
-//             </div>
-
-//             {/* ===== CHARTS (ADDED BELOW CARDS) ===== */}
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//                 {/* PIE CHART */}
-//                 <div className="rounded-xl border border-gray-800 bg-[#020617] p-6">
-//                     <h2 className="mb-4 text-lg font-semibold">
-//                         Attendance Distribution
-//                     </h2>
-
-//                     <div className="h-64">
-//                         <ResponsiveContainer width="100%" height="100%">
-//                             <PieChart>
-//                                 <Pie
-//                                     data={pieData}
-//                                     dataKey="value"
-//                                     nameKey="name"
-//                                     outerRadius={90}
-//                                     label
-//                                 >
-//                                     {pieData.map((_, index) => (
-//                                         <Cell
-//                                             key={index}
-//                                             fill={COLORS[index]}
-//                                         />
-//                                     ))}
-//                                 </Pie>
-//                             </PieChart>
-//                         </ResponsiveContainer>
-//                     </div>
-//                 </div>
-//                 {/* BAR CHART */}
-//                 <div className="rounded-xl border border-gray-800 bg-[#020617] p-6">
-//                     <h2 className="mb-4 text-lg font-semibold">
-//                         Today Summary
-//                     </h2>
-
-//                     <div className="h-64">
-//                         <ResponsiveContainer width="100%" height="100%">
-//                             <BarChart
-//                                 data={[
-//                                     { name: "Present", value: present },
-//                                     { name: "Absent", value: absent }
-//                                 ]}
-//                             >
-//                                 <XAxis dataKey="name" />
-//                                 <Tooltip />
-//                                 <Bar dataKey="value" fill="#22c55e" />
-//                             </BarChart>
-//                         </ResponsiveContainer>
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// }
-
-// function StatCard({
-//     title,
-//     value,
-//     color
-// }: {
-//     title: string;
-//     value: number;
-//     color: string;
-// }) {
-//     return (
-//         <div className="rounded-xl border border-gray-800 bg-[#020617] p-6">
-//             <p className="text-gray-400">{title}</p>
-//             <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
-//         </div>
-//     );
-// }
-
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import { getAllStudents } from "../../services/students";
-import {
-    PieChart,
-    Pie,
-    Cell,
-    ResponsiveContainer,
-    BarChart,
-    Bar,
-    XAxis,
-    Tooltip,
-} from "recharts";
 
-/* ✅ LOCAL TYPE — backend returns this shape */
+/* LOCAL TYPE — backend returns this shape */
 type TodayAttendance = {
     total_present: number;
 };
@@ -175,106 +10,70 @@ type TodayAttendance = {
 export default function AdminDashboard() {
     const [totalStudents, setTotalStudents] = useState(0);
     const [attendance, setAttendance] = useState<TodayAttendance>({
-    total_present: 0,
-});
-const [loading, setLoading] = useState(true);
+        total_present: 0,
+    });
+    const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-    async function load() {
-        try {
-        // students
-        const students = await getAllStudents(); // ✅ ARRAY
-        setTotalStudents(students.length);
+    useEffect(() => {
+        async function load() {
+            try {
+                const [students, res] = await Promise.all([
+                    getAllStudents(),
+                    api.get("/attendance/today")
+                ]);
+                
+                setTotalStudents(students.length);
+                setAttendance(res.data);
+            } catch (err) {
+                console.error("Admin dashboard load failed", err);
+            } finally {
+                setLoading(false);
+            }
+        }
 
-        // today attendance
-        const res = await api.get("/attendance/today");
-        setAttendance(res.data);
-    } catch (err) {
-        console.error("Admin dashboard load failed", err);
-        setTotalStudents(0);
-        setAttendance({ total_present: 0 });
-    } finally {
-        setLoading(false);
+        load();
+        const interval = setInterval(load, 10000);
+        return () => clearInterval(interval);
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex h-64 items-center justify-center text-gray-400">
+                <p>Loading overview statistics...</p>
+            </div>
+        );
     }
-    }
-
-    load();
-}, []);
-
-if (loading) {
-    return <p className="text-gray-400">Loading dashboard...</p>;
-}
 
     const present = attendance.total_present;
     const absent = Math.max(totalStudents - present, 0);
 
-const chartData = [
-    { name: "Present", value: present },
-    { name: "Absent", value: absent },
-    ];
+    return (
+        <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-white">Admin Overview</h1>
 
-const COLORS = ["#22c55e", "#ef4444"];
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="rounded-xl border border-gray-800 bg-slate-900/50 p-8 shadow-lg">
+                    <p className="text-sm font-medium text-blue-400 uppercase tracking-wider">Total Students</p>
+                    <p className="mt-2 text-5xl font-bold text-white">{totalStudents}</p>
+                </div>
 
-return (
-    <div className="space-y-6">
-        <h1 className="text-2xl font-semibold">Dashboard Overview</h1>
+                <div className="rounded-xl border border-gray-800 bg-slate-900/50 p-8 shadow-lg">
+                    <p className="text-sm font-medium text-green-400 uppercase tracking-wider">Today Present</p>
+                    <p className="mt-2 text-5xl font-bold text-white">{present}</p>
+                </div>
 
-      {/* STAT CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Total Students" value={totalStudents} color="text-green-400" />
-        <StatCard title="Today Present" value={present} color="text-green-400" />
-        <StatCard title="Absent" value={absent} color="text-red-400" />
-    </div>
+                <div className="rounded-xl border border-gray-800 bg-slate-900/50 p-8 shadow-lg">
+                    <p className="text-sm font-medium text-red-400 uppercase tracking-wider">Absent</p>
+                    <p className="mt-2 text-5xl font-bold text-white">{absent}</p>
+                </div>
+            </div>
 
-      {/* CHARTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* PIE */}
-        <div className="rounded-xl border border-gray-800 bg-[#020617] p-6">
-            <h2 className="mb-4 text-lg font-semibold">Attendance Distribution</h2>
-            <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                <Pie data={chartData} dataKey="value" outerRadius={90} label>
-                    {chartData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i]} />
-                ))}
-                </Pie>
-            </PieChart>
-            </ResponsiveContainer>
+            <div className="rounded-xl border border-gray-800 bg-amber-900/10 p-6">
+                <p className="text-amber-400 text-sm italic">
+                    Note: Charts are temporarily disabled to ensure compatibility with React 19. 
+                    You can still manage students and view full reports in the other tabs.
+                </p>
+            </div>
         </div>
-        </div>
-
-        {/* BAR */}
-        <div className="rounded-xl border border-gray-800 bg-[#020617] p-6">
-            <h2 className="mb-4 text-lg font-semibold">Today Summary</h2>
-            <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                <XAxis dataKey="name" />
-                <Tooltip />
-                <Bar dataKey="value" fill="#22c55e" />
-            </BarChart>
-            </ResponsiveContainer>
-        </div>
-        </div>
-    </div>
-    </div>
-);
-}
-
-function StatCard({
-    title,
-    value,
-    color,
-}: {
-    title: string;
-    value: number;
-    color: string;
-}) {
-return (
-    <div className="rounded-xl border border-gray-800 bg-[#020617] p-6">
-        <p className="text-gray-400">{title}</p>
-        <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
-    </div>
-);
+    );
 }
