@@ -6,6 +6,10 @@ from PIL import Image
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from backend.database import get_connection
 import sqlite3
+import os
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CACHE_PATH = os.path.join(ROOT_DIR, "attendance_service", "students_cache.pkl")
 
 router = APIRouter(
     prefix="/students",
@@ -33,9 +37,13 @@ async def register_student(
     student_id: str = Form(...),
     name: str = Form(...),
     department: str = Form(...),
+    password: str = Form(...),
     image: UploadFile = File(...)
 ):
     try:
+        from .auth import pwd_context
+        hashed_password = pwd_context.hash(password)
+
         image_bytes = await image.read()
         img = Image.open(BytesIO(image_bytes)).convert("RGB")
 
@@ -54,14 +62,14 @@ async def register_student(
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO students (student_id, name, department, embedding) VALUES (?, ?, ?, ?)",
-            (student_id, name, department, pickle.dumps(embedding.cpu().numpy()))
+            "INSERT INTO students (student_id, name, department, password, embedding) VALUES (?, ?, ?, ?, ?)",
+            (student_id, name, department, hashed_password, pickle.dumps(embedding.cpu().numpy()))
         )
         conn.commit()
         conn.close()
 
         # ✅ WRITE CLEAN CACHE ENTRY
-        os.makedirs("attendance_service", exist_ok=True)
+        os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 
         cache = []
         if os.path.exists(CACHE_PATH):
@@ -85,6 +93,7 @@ async def register_student(
     except HTTPException:
         raise
     except Exception as e:
+        print(f"ERROR: Student registration failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

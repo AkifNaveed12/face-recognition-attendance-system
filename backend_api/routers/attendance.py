@@ -34,6 +34,18 @@ def today_attendance():
         ]
     }
 
+@router.get("/history")
+def get_attendance_history():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT student_id, date, time FROM attendance ORDER BY date DESC, time DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [
+        {"student_id": r[0], "date": r[1], "time": r[2]}
+        for r in rows
+    ]
+
 
 # ----------------------------
 # ✅ NEW: Get FULL attendance records of a student

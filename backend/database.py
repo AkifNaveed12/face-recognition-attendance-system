@@ -18,6 +18,7 @@ def create_tables():
         student_id TEXT UNIQUE,
         name TEXT,
         department TEXT,
+        password TEXT,
         embedding BLOB
     )              
     """)

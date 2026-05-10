@@ -10,6 +10,7 @@ export default function AddStudentModal({ onClose, onSuccess }: Props) {
     const [studentId, setStudentId] = useState("");
     const [name, setName] = useState("");
     const [department, setDepartment] = useState("");
+    const [password, setPassword] = useState("");
     const [image, setImage] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -20,6 +21,7 @@ export default function AddStudentModal({ onClose, onSuccess }: Props) {
         formData.append("student_id", studentId);
         formData.append("name", name);
         formData.append("department", department);
+        formData.append("password", password);
         formData.append("image", image);
 
         try {
@@ -58,6 +60,14 @@ export default function AddStudentModal({ onClose, onSuccess }: Props) {
                     placeholder="Department"
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
+                />
+
+                <input
+                    type="password"
+                    className="mb-3 w-full rounded bg-black/30 p-2"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
 
                 <input

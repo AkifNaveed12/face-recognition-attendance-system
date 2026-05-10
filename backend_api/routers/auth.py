@@ -12,14 +12,10 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 SECRET_KEY = "supersecret"
 ALGORITHM = "HS256"
 
+from backend.database import get_connection
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-
-# TEMP mock storage (replace with DB later)
-students = {
-    "CS001": pwd_context.hash("pass123"),
-    "CS002": pwd_context.hash("pass123"),
-}
 
 def verify_password(plain, hashed):
     return pwd_context.verify(plain, hashed)
@@ -36,13 +32,19 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     student_id = form_data.username
     password = form_data.password
 
-    if student_id not in students:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT password FROM students WHERE student_id = ?", (student_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
         )
 
-    if not verify_password(password, students[student_id]):
+    if not verify_password(password, row[0]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
@@ -53,7 +55,24 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         "token_type": "bearer"
     }
 
+@router.post("/register")
+def register(student_id: str, name: str, department: str, password: str):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Check if user already exists
+    cursor.execute("SELECT 1 FROM students WHERE student_id = ?", (student_id,))
+    if cursor.fetchone():
+        conn.close()
+        raise HTTPException(status_code=400, detail="Student ID already registered")
 
+    cursor.execute(
+        "INSERT INTO students (student_id, name, department, password) VALUES (?, ?, ?, ?)",
+        (student_id, name, department, pwd_context.hash(password))
+    )
+    conn.commit()
+    conn.close()
+    return {"message": "User registered successfully"}
 
 @router.get("/me")
 def me(token: str = Depends(oauth2_scheme)):
