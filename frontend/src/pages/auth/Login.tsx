@@ -114,7 +114,11 @@ export default function Login() {
 
             localStorage.setItem('token', res.data.access_token);
 
-            navigate('/student', { replace: true });
+            if (username === 'admin') {
+                navigate('/admin', { replace: true });
+            } else {
+                navigate('/student', { replace: true });
+            }
         } catch (err) {
             setError('Invalid credentials. Please try again.');
         } finally {

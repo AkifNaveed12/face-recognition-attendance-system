@@ -13,6 +13,7 @@ import StudentDashboard from "../pages/student/Dashboard";
 import StudentAttendance from "../pages/student/Attendance";
 
 import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
 
 export const router = createBrowserRouter([
   { 
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
   { 
     path: "/login", 
     element: <Login /> 
+  },
+  { 
+    path: "/register", 
+    element: <Register /> 
   },
 
   // ADMIN ROUTES

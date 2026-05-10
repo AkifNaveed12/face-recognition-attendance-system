@@ -37,9 +37,13 @@ async def register_student(
     student_id: str = Form(...),
     name: str = Form(...),
     department: str = Form(...),
+    password: str = Form(...),
     image: UploadFile = File(...)
 ):
     try:
+        from .auth import pwd_context
+        hashed_password = pwd_context.hash(password)
+
         image_bytes = await image.read()
         img = Image.open(BytesIO(image_bytes)).convert("RGB")
 
@@ -58,8 +62,8 @@ async def register_student(
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO students (student_id, name, department, embedding) VALUES (?, ?, ?, ?)",
-            (student_id, name, department, pickle.dumps(embedding.cpu().numpy()))
+            "INSERT INTO students (student_id, name, department, password, embedding) VALUES (?, ?, ?, ?, ?)",
+            (student_id, name, department, hashed_password, pickle.dumps(embedding.cpu().numpy()))
         )
         conn.commit()
         conn.close()
