@@ -7,9 +7,25 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import status
 
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # loads .env from project root (ignored by git)
+
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-SECRET_KEY = "supersecret"
+# AUTH-T3: Secret loaded from environment variable, not hardcoded
+_raw_secret = os.getenv("JWT_SECRET_KEY")
+if not _raw_secret:
+    import warnings
+    warnings.warn(
+        "[SECURITY] JWT_SECRET_KEY not set in environment. "
+        "Set it in your .env file before deploying.",
+        stacklevel=2,
+    )
+    _raw_secret = "insecure-default-change-me"
+
+SECRET_KEY = _raw_secret
 ALGORITHM = "HS256"
 
 from backend.database import get_connection
