@@ -24,7 +24,11 @@ app.include_router(attendance_router)
 import os
 
 # Production CORS origins setup (Task Group 3)
-origins = ["http://localhost:5173", "http://localhost:3000"]
+origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://face-recognition-attendance-system-jet.vercel.app"
+]
 frontend_env = os.getenv("FRONTEND_URL")
 if frontend_env:
     origins.extend([url.strip() for url in frontend_env.split(",") if url.strip()])
