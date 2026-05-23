@@ -6,13 +6,19 @@ import { useAuth } from "../hooks/useAuth";
 
 type Props = {
   children: ReactNode;
+  requiredRole?: "admin" | "student";
 };
 
-export default function ProtectedRoute({ children }: Props) {
-  const { isAuthenticated } = useAuth();
+export default function ProtectedRoute({ children, requiredRole }: Props) {
+  const { isAuthenticated, role } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (requiredRole && role !== requiredRole) {
+    // If they have a valid session but wrong role, redirect to their proper home
+    return <Navigate to={role === "admin" ? "/admin" : "/student"} replace />;
   }
 
   return <>{children}</>;

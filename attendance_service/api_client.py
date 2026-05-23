@@ -1,6 +1,7 @@
 import requests
+from config import BACKEND_URL, get_auth_headers
 
-API_BASE = "http://127.0.0.1:8000"
+API_BASE = BACKEND_URL
 
 
 def mark_attendance(student_id: str) -> bool:
@@ -10,9 +11,11 @@ def mark_attendance(student_id: str) -> bool:
     """
 
     try:
+        headers = get_auth_headers()
         res = requests.post(
             f"{API_BASE}/attendance/mark",
             json={"student_id": student_id},
+            headers=headers,
             timeout=5
         )
 

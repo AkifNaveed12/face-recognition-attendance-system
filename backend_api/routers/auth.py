@@ -39,6 +39,7 @@ def verify_password(plain, hashed):
 def create_token(student_id: str):
     payload = {
         "sub": student_id,
+        "role": "admin" if student_id == "admin" else "student",
         "exp": datetime.utcnow() + timedelta(hours=8)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
@@ -90,8 +91,7 @@ def register(student_id: str, name: str, department: str, password: str):
     conn.close()
     return {"message": "User registered successfully"}
 
-@router.get("/me")
-def me(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         student_id: str = payload.get("sub")
@@ -101,7 +101,8 @@ def me(token: str = Depends(oauth2_scheme)):
                 detail="Invalid token: missing subject",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        return {"student_id": student_id}
+        role: str = payload.get("role", "student")
+        return {"student_id": student_id, "role": role}
     except ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -114,3 +115,15 @@ def me(token: str = Depends(oauth2_scheme)):
             detail="Invalid token",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+def require_admin(user: dict = Depends(get_current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: Admin access required"
+        )
+    return user
+
+@router.get("/me")
+def me(user: dict = Depends(get_current_user)):
+    return {"student_id": user["student_id"], "role": user["role"]}
