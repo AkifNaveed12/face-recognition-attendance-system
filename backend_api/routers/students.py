@@ -94,6 +94,12 @@ async def register_student(
 
     except HTTPException:
         raise
+    except sqlite3.IntegrityError as e:
+        print(f"ERROR: Student registration uniqueness conflict: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="Student ID is already registered"
+        )
     except Exception as e:
         print(f"ERROR: Student registration failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
