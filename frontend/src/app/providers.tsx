@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 interface AuthContextType {
     token: string | null;
     studentId: string | null;
+    role: string | null;
     isAuthenticated: boolean;
     logout: () => void;
 }
@@ -23,12 +24,14 @@ export function AuthProvider({ children }: Props) {
         () => localStorage.getItem("token")
     );
     const [studentId, setStudentId] = useState<string | null>(null);
+    const [role, setRole] = useState<string | null>(null);
     const navigate = useNavigate();
 
-    // Decode studentId from token payload (client-side, no crypto verification)
+    // Decode studentId and role from token payload (client-side, no crypto verification)
     useEffect(() => {
         if (!token) {
             setStudentId(null);
+            setRole(null);
             return;
         }
         try {
@@ -36,8 +39,10 @@ export function AuthProvider({ children }: Props) {
             if (parts.length !== 3) throw new Error("bad token");
             const payload = JSON.parse(atob(parts[1]));
             setStudentId(payload?.sub ?? null);
+            setRole(payload?.role ?? null);
         } catch {
             setStudentId(null);
+            setRole(null);
         }
     }, [token]);
 
@@ -53,6 +58,7 @@ export function AuthProvider({ children }: Props) {
         localStorage.removeItem("token");
         setToken(null);
         setStudentId(null);
+        setRole(null);
         navigate("/login", { replace: true });
     }, [navigate]);
 
@@ -61,6 +67,7 @@ export function AuthProvider({ children }: Props) {
             value={{
                 token,
                 studentId,
+                role,
                 isAuthenticated: !!token,
                 logout,
             }}
