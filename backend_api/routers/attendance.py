@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from datetime import date, datetime
+from pydantic import BaseModel, Field
 from backend.database import get_connection
 from .auth import require_admin, get_current_user
 
@@ -114,14 +115,15 @@ def student_attendance(student_id: str, current_user: dict = Depends(get_current
     }
 
 
+class AttendanceMarkRequest(BaseModel):
+    student_id: str = Field(..., min_length=2, max_length=50)
+
 # ----------------------------
 # Mark attendance
 # ----------------------------
 @router.post("/mark")
-def mark_attendance(data: dict, current_user: dict = Depends(get_current_user)):
-    student_id = data.get("student_id")
-    if not student_id:
-        raise HTTPException(status_code=400, detail="student_id missing")
+def mark_attendance(data: AttendanceMarkRequest, current_user: dict = Depends(get_current_user)):
+    student_id = data.student_id
 
     now = datetime.now()
     today = now.strftime("%Y-%m-%d")
