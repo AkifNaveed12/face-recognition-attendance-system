@@ -1,18 +1,17 @@
 // src/routes/ProtectedRoute.tsx
+// AUTH-T1: Uses centralized useAuth() instead of ad-hoc localStorage reads
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import { useAuth } from "../hooks/useAuth";
 
 type Props = {
   children: ReactNode;
 };
 
 export default function ProtectedRoute({ children }: Props) {
-  // ✅ CHECK THE REAL TOKEN KEY
-  const token =
-    localStorage.getItem("access_token") || // ← MOST LIKELY
-    localStorage.getItem("token");           // ← fallback
+  const { isAuthenticated } = useAuth();
 
-  if (!token) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
