@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import jwt, JWTError, ExpiredSignatureError
@@ -91,7 +91,29 @@ def register(student_id: str, name: str, department: str, password: str):
     conn.close()
     return {"message": "User registered successfully"}
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(request: Request):
+    # 1. Check for X-API-KEY authentication (Task Group 4)
+    api_key = request.headers.get("X-API-KEY")
+    if api_key:
+        expected_key = os.getenv("SERVICE_API_KEY") or "dev-service-api-key"
+        if api_key == expected_key:
+            return {"student_id": "service_client", "role": "admin"}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid API Key"
+            )
+
+    # 2. Check for standard JWT token authentication
+    authorization: str = request.headers.get("Authorization")
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    token = authorization.split(" ")[1]
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         student_id: str = payload.get("sub")
