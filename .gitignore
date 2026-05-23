@@ -39,6 +39,14 @@ build/
 # Environment
 .env
 
+# Database — local SQLite file, must not be committed
+database/attendance.db
+*.db
+
+# Attendance service face embedding cache — local binary, must not be committed
+attendance_service/students_cache.pkl
+*.pkl
+
 # OS
 .DS_Store
 Thumbs.db

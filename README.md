@@ -136,9 +136,10 @@ You can adjust recognition parameters in `attendance_service/config.py`:
 
 ## 👨‍💻 Author
 **Akif Naveed**
-*Software Engineering Student | AI & Full Stack Developer*
+*Software Engineering Student | AI Enthusiast*
 - [LinkedIn](https://www.linkedin.com/in/akif-naveed/)
 - [GitHub](https://github.com/AkifNaveed12)
+- [Portfolio](https://portfolio-muhammad-akif-naveed.vercel.app/)
 
 ---
 *Maintained collaboratively for academic and enhancement purposes.*
