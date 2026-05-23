@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 
 interface ValidationErrors {
@@ -16,6 +16,8 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const isExpired = searchParams.get('expired') === 'true';
 
     // Validate individual field
     const validateField = (
@@ -145,6 +147,12 @@ export default function Login() {
                     </div>
 
                     <div className="space-y-5">
+                        {isExpired && (
+                            <div className="p-4 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg text-sm text-center">
+                                Your session has expired. Please sign in again.
+                            </div>
+                        )}
+
                         <input
                             value={username}
                             onChange={handleUsernameChange}
