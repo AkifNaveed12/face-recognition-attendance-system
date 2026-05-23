@@ -1,9 +1,10 @@
 import cv2
 import time
+import os
 from collections import deque, defaultdict
 
 from config import FACE_THRESHOLD, FRAME_SKIP, CAMERA_INDEX
-from face_recognizer import recognize_faces, load_students
+from face_recognizer import recognize_faces, load_students, CACHE_PATH
 from api_client import mark_attendance
 from cache_builder import build_cache
 from liveness import BlinkDetector
@@ -91,6 +92,10 @@ def main():
     frame_count = 0
     consecutive_failures = 0  # ATTENDANCE-T0: track consecutive read failures
 
+    # ATTENDANCE-T2: track cache file modification time
+    last_cache_mtime = os.path.getmtime(CACHE_PATH) if os.path.exists(CACHE_PATH) else 0
+    last_cache_check = time.time()
+
     print("[INFO] Attendance service started. Press 'q' to quit.")
 
     while True:
@@ -138,10 +143,24 @@ def main():
         if frame_count % FRAME_SKIP != 0:
             continue
 
+        # ATTENDANCE-T2: Poll students_cache.pkl modification time to reload if changed
+        now = time.time()
+        if now - last_cache_check >= 5.0:
+            last_cache_check = now
+            if os.path.exists(CACHE_PATH):
+                try:
+                    mtime = os.path.getmtime(CACHE_PATH)
+                    if mtime > last_cache_mtime:
+                        new_students = load_students()
+                        if new_students is not None:
+                            students = new_students
+                            last_cache_mtime = mtime
+                            print(f"[INFO] Automatically reloaded cache: {len(students)} students loaded.")
+                except Exception as e:
+                    print(f"[WARN] Failed to reload cache dynamically: {e}")
+
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = recognize_faces(rgb, students, FACE_THRESHOLD)
-
-        now = time.time()
 
         blinked = blink_detector.process(frame)
 

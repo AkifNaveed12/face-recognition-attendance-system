@@ -39,8 +39,12 @@ def load_students():
         print("[WARN] Cache file not found")
         return []
 
-    with open(CACHE_PATH, "rb") as f:
-        data = pickle.load(f)
+    try:
+        with open(CACHE_PATH, "rb") as f:
+            data = pickle.load(f)
+    except Exception as e:
+        print(f"[WARN] Failed to load cache file: {e}")
+        return None
 
     students = []
 
