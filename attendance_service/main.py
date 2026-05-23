@@ -145,14 +145,18 @@ def main():
 
         blinked = blink_detector.process(frame)
 
+        # ATTENDANCE-T3: collect which student IDs were recognized this frame
+        recognized_ids = set()
+
         for r in results:
             x1, y1, x2, y2 = r["box"]
             sid = r["student_id"]
             name = r["name"]
             score = r["confidence"]
+            recognized_ids.add(sid)
 
             # ----------------------------
-            # Frame voting
+            # Frame voting — append True for recognized students
             # ----------------------------
             vote_buffer[sid].append(True)
             votes = sum(vote_buffer[sid])
@@ -175,10 +179,23 @@ def main():
                             blink_detector.blinked = False
                             print(f"[MARKED] {name} ({sid})")
                             label += " ✅"
+                        else:
+                            # ATTENDANCE-T4: already_marked or API returned False
+                            # Reset blink so a fresh blink is required next attempt
+                            blink_detector.blinked = False
+                            label += " | Already marked today"
                     except Exception as e:
+                        # ATTENDANCE-T4: on API error, reset blink state
+                        blink_detector.blinked = False
                         print(f"[ERROR] Attendance API failed for {sid}: {e}")
                 else:
                     label += " | Blink to confirm 👁️"
+
+        # ATTENDANCE-T3: append False for students in vote_buffer NOT seen this frame
+        # This decays stale confidence so students who leave don't stay "eligible"
+        for tracked_sid in list(vote_buffer.keys()):
+            if tracked_sid not in recognized_ids:
+                vote_buffer[tracked_sid].append(False)
 
             # ----------------------------
             # Draw bounding box
