@@ -210,12 +210,6 @@ def main():
                 else:
                     label += " | Blink to confirm 👁️"
 
-        # ATTENDANCE-T3: append False for students in vote_buffer NOT seen this frame
-        # This decays stale confidence so students who leave don't stay "eligible"
-        for tracked_sid in list(vote_buffer.keys()):
-            if tracked_sid not in recognized_ids:
-                vote_buffer[tracked_sid].append(False)
-
             # ----------------------------
             # Draw bounding box
             # ----------------------------
@@ -230,6 +224,12 @@ def main():
                 (0, 255, 0),
                 2,
             )
+
+        # ATTENDANCE-T3: append False for students in vote_buffer NOT seen this frame
+        # This decays stale confidence so students who leave don't stay "eligible"
+        for tracked_sid in list(vote_buffer.keys()):
+            if tracked_sid not in recognized_ids:
+                vote_buffer[tracked_sid].append(False)
 
         cv2.imshow("Attendance Camera", frame)
 
