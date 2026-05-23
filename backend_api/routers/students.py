@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
 import torch
 import pickle
 from io import BytesIO
@@ -7,6 +7,7 @@ from facenet_pytorch import MTCNN, InceptionResnetV1
 from backend.database import get_connection
 import sqlite3
 import os
+from .auth import require_admin
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CACHE_PATH = os.path.join(ROOT_DIR, "attendance_service", "students_cache.pkl")
@@ -38,7 +39,8 @@ async def register_student(
     name: str = Form(...),
     department: str = Form(...),
     password: str = Form(...),
-    image: UploadFile = File(...)
+    image: UploadFile = File(...),
+    admin_user: dict = Depends(require_admin)
 ):
     try:
         from .auth import pwd_context
@@ -92,13 +94,19 @@ async def register_student(
 
     except HTTPException:
         raise
+    except sqlite3.IntegrityError as e:
+        print(f"ERROR: Student registration uniqueness conflict: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="Student ID is already registered"
+        )
     except Exception as e:
         print(f"ERROR: Student registration failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/all")
-def get_all_students():
+def get_all_students(admin_user: dict = Depends(require_admin)):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT student_id, name, department FROM students")
@@ -115,7 +123,7 @@ def get_all_students():
     ]
 
 @router.get("/{student_id}/embedding")
-def get_student_embedding(student_id: str):
+def get_student_embedding(student_id: str, admin_user: dict = Depends(require_admin)):
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -129,7 +137,13 @@ def get_student_embedding(student_id: str):
     if not row:
         raise HTTPException(status_code=404, detail="Student not found")
 
-    embedding = pickle.loads(row[2])[0]
+    if not row[2]:
+        raise HTTPException(status_code=400, detail="Student embedding is missing or not initialized")
+
+    try:
+        embedding = pickle.loads(row[2])[0]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to deserialize embedding data: {e}")
 
     return {
         "student_id": row[0],

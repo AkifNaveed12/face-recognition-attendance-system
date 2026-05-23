@@ -1,5 +1,6 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import ProtectedRoute from "../routes/ProtectedRoute";
+import { AuthProvider } from "./providers";
 
 import AdminLayout from "../layouts/AdminLayout";
 import StudentLayout from "../layouts/StudentLayout";
@@ -16,6 +17,10 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 
 export const router = createBrowserRouter([
+  {
+    // Root wrapper: provides AuthContext to entire app
+    element: <AuthProvider><Outlet /></AuthProvider>,
+    children: [
   { 
     path: "/", 
     element: <Navigate to="/login" replace /> 
@@ -33,7 +38,7 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="admin">
         <AdminLayout />
       </ProtectedRoute>
     ),
@@ -49,7 +54,7 @@ export const router = createBrowserRouter([
   {
     path: "/student",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="student">
         <StudentLayout />
       </ProtectedRoute>
     ),
@@ -64,4 +69,6 @@ export const router = createBrowserRouter([
     path: "*", 
     element: <Navigate to="/login" replace /> 
   },
+  ], // end AuthProvider children
+  },   // end root wrapper
 ]);

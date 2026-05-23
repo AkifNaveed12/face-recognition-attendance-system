@@ -1,6 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from datetime import date, datetime
+from pydantic import BaseModel, Field
 from backend.database import get_connection
+from .auth import require_admin, get_current_user
 
 router = APIRouter(
     prefix="/attendance",
@@ -11,7 +13,7 @@ router = APIRouter(
 # Get today's attendance
 # ----------------------------
 @router.get("/today")
-def today_attendance():
+def today_attendance(admin_user: dict = Depends(require_admin)):
     today = date.today().isoformat()
 
     conn = get_connection()
@@ -35,7 +37,7 @@ def today_attendance():
     }
 
 @router.get("/history")
-def get_attendance_history():
+def get_attendance_history(admin_user: dict = Depends(require_admin)):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT student_id, date, time FROM attendance ORDER BY date DESC, time DESC")
@@ -52,7 +54,10 @@ def get_attendance_history():
 # (THIS FIXES FRONTEND TABLE + GRAPH)
 # ----------------------------
 @router.get("/student/{student_id}/records")
-def student_attendance_records(student_id: str):
+def student_attendance_records(student_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != "admin" and current_user.get("student_id") != student_id:
+        raise HTTPException(status_code=403, detail="Forbidden: You can only access your own records")
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -77,7 +82,10 @@ def student_attendance_records(student_id: str):
 # Get attendance stats of a student (KEEP THIS)
 # ----------------------------
 @router.get("/student/{student_id}")
-def student_attendance(student_id: str):
+def student_attendance(student_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != "admin" and current_user.get("student_id") != student_id:
+        raise HTTPException(status_code=403, detail="Forbidden: You can only access your own stats")
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -107,14 +115,15 @@ def student_attendance(student_id: str):
     }
 
 
+class AttendanceMarkRequest(BaseModel):
+    student_id: str = Field(..., min_length=2, max_length=50)
+
 # ----------------------------
 # Mark attendance
 # ----------------------------
 @router.post("/mark")
-def mark_attendance(data: dict):
-    student_id = data.get("student_id")
-    if not student_id:
-        raise HTTPException(status_code=400, detail="student_id missing")
+def mark_attendance(data: AttendanceMarkRequest, current_user: dict = Depends(get_current_user)):
+    student_id = data.student_id
 
     now = datetime.now()
     today = now.strftime("%Y-%m-%d")

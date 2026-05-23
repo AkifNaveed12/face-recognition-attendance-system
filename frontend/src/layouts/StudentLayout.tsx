@@ -1,48 +1,59 @@
-import { Outlet, NavLink, Navigate } from "react-router-dom";
-
+// src/layouts/StudentLayout.tsx
+// AUTH-T1: Removed redundant localStorage auth check (handled by ProtectedRoute via useAuth).
+//          Added logout button using useAuth().
+import { Outlet, NavLink } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function StudentLayout() {
-    const token = localStorage.getItem("token");
+    const { logout, studentId } = useAuth();
 
-    if (!token) {
-    return <Navigate to="/login" replace />;
-}
-return (
-    <div className="flex min-h-screen bg-[#020617] text-white">
-    <aside className="w-64 border-r border-gray-800 p-4">
-        <h2 className="mb-6 text-xl font-semibold text-blue-400">
-        Student Panel
-        </h2>
+    return (
+        <div className="flex min-h-screen bg-[#020617] text-white">
+            <aside className="w-64 border-r border-gray-800 p-4 flex flex-col">
+                <h2 className="mb-6 text-xl font-semibold text-blue-400">
+                    Student Panel
+                </h2>
 
-        <nav className="space-y-2">
-        <NavLink
-            to="/student"
-            end
-            className={({ isActive }) =>
-            `block rounded px-3 py-2 ${
-                isActive ? "bg-white/10" : "hover:bg-white/5"
-            }`
-            }
-        >
-            Dashboard
-        </NavLink>
+                <nav className="space-y-2 flex-1">
+                    <NavLink
+                        to="/student"
+                        end
+                        className={({ isActive }) =>
+                            `block rounded px-3 py-2 ${isActive ? "bg-white/10" : "hover:bg-white/5"}`
+                        }
+                    >
+                        Dashboard
+                    </NavLink>
 
-        <NavLink
-            to="/student/attendance"
-            className={({ isActive }) =>
-            `block rounded px-3 py-2 ${
-                isActive ? "bg-white/10" : "hover:bg-white/5"
-            }`
-            }
-        >
-            Attendance
-        </NavLink>
-        </nav>
-    </aside>
+                    <NavLink
+                        to="/student/attendance"
+                        className={({ isActive }) =>
+                            `block rounded px-3 py-2 ${isActive ? "bg-white/10" : "hover:bg-white/5"}`
+                        }
+                    >
+                        Attendance
+                    </NavLink>
+                </nav>
 
-    <main className="flex-1 p-6">
-        <Outlet />
-    </main>
-    </div>
-);
+                {/* Logout section */}
+                <div className="mt-auto pt-4 border-t border-gray-800">
+                    {studentId && (
+                        <p className="text-xs text-gray-500 mb-2 truncate">
+                            Logged in: {studentId}
+                        </p>
+                    )}
+                    <button
+                        onClick={logout}
+                        className="w-full rounded px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 text-left transition-colors"
+                    >
+                        Sign Out
+                    </button>
+                </div>
+            </aside>
+
+            <main className="flex-1 p-6">
+                <Outlet />
+            </main>
+        </div>
+    );
 }
