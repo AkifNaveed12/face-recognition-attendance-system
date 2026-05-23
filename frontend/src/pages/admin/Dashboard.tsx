@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import { getAllStudents } from "../../services/students";
+import {
+    PieChart,
+    Pie,
+    Cell,
+    ResponsiveContainer,
+    Tooltip,
+} from "recharts";
 
 /* LOCAL TYPE — backend returns this shape */
 type TodayAttendance = {
@@ -47,6 +54,13 @@ export default function AdminDashboard() {
     const present = attendance.total_present;
     const absent = Math.max(totalStudents - present, 0);
 
+    const chartData = [
+        { name: "Present", value: present },
+        { name: "Absent", value: absent },
+    ];
+
+    const COLORS = ["#10b981", "#ef4444"];
+
     return (
         <div className="space-y-6">
             <h1 className="text-2xl font-bold text-white">Admin Overview</h1>
@@ -68,12 +82,35 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            <div className="rounded-xl border border-gray-800 bg-amber-900/10 p-6">
-                <p className="text-amber-400 text-sm italic">
-                    Note: Charts are temporarily disabled to ensure compatibility with React 19. 
-                    You can still manage students and view full reports in the other tabs.
-                </p>
-            </div>
+            {totalStudents > 0 && (
+                <div className="rounded-xl border border-gray-800 bg-slate-900/30 p-6 shadow-lg">
+                    <h2 className="text-lg font-semibold text-white mb-4">Today's Attendance Ratio</h2>
+                    <div className="h-64 flex justify-center items-center">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={chartData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={60}
+                                    outerRadius={90}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155", borderRadius: "8px" }}
+                                    itemStyle={{ color: "#fff" }}
+                                    labelStyle={{ display: "none" }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
