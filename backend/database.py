@@ -3,9 +3,12 @@ import pickle
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, 'database', 'attendance.db')
+DB_PATH = os.getenv("DATABASE_PATH") or os.path.join(BASE_DIR, 'database', 'attendance.db')
 
 def  get_connection():
+    # Ensure the parent directory of database exists
+    db_dir = os.path.dirname(os.path.abspath(DB_PATH))
+    os.makedirs(db_dir, exist_ok=True)
     return sqlite3.connect(DB_PATH)
 
 def create_tables():

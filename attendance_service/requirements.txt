@@ -1,0 +1,13 @@
+# Face Recognition Attendance Service - Pinned Dependencies
+# For local edge machine webcam and face verification runtime
+
+opencv-python==4.11.0.86
+mediapipe==0.10.9
+facenet-pytorch==2.6.0
+torch==2.2.2
+torchvision==0.17.2
+numpy==1.26.4
+requests==2.32.5
+pillow==10.2.0
+scikit-learn==1.8.0
+python-dotenv==1.2.2

@@ -108,12 +108,57 @@ def test_attendance_flow():
     conn.commit()
     conn.close()
 
+def test_service_api_key_auth():
+    # Setup test student CS999 in DB
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM students WHERE student_id = ?", ("CS999",))
+    cursor.execute(
+        "INSERT INTO students (student_id, name, department, password, embedding) VALUES (?, ?, ?, ?, ?)",
+        ("CS999", "Service Test", "CS", "pwd", b"fake_embedding")
+    )
+    conn.commit()
+    conn.close()
+
+    # Valid X-API-KEY headers (default key is "dev-service-api-key" if env not set)
+    valid_headers = {"X-API-KEY": "dev-service-api-key"}
+    invalid_headers = {"X-API-KEY": "wrong-api-key"}
+
+    # 1. Access with invalid key -> 403 Forbidden
+    assert client.get("/students/all", headers=invalid_headers).status_code == 403
+    assert client.post("/attendance/mark", json={"student_id": "CS999"}, headers=invalid_headers).status_code == 403
+
+    # 2. Access with valid key -> 200 OK
+    assert client.get("/students/all", headers=valid_headers).status_code == 200
+    
+    # Mark attendance with valid key
+    resp = client.post("/attendance/mark", json={"student_id": "CS999"}, headers=valid_headers)
+    assert resp.status_code == 200
+    assert resp.json()["status"] in ["marked", "already_marked"]
+
+    # Clean up
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM students WHERE student_id = ?", ("CS999",))
+    cursor.execute("DELETE FROM attendance WHERE student_id = ?", ("CS999",))
+    conn.commit()
+    conn.close()
+
+def test_health_endpoint():
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "ok"
+    assert "database" in data
+
 if __name__ == "__main__":
     test_root()
     test_unauthorized_access()
     test_pydantic_validation()
     test_duplicate_student_integrity()
     test_attendance_flow()
+    test_service_api_key_auth()
+    test_health_endpoint()
     print("==============================================")
     print("ALL INTEGRATION AND EDGE-CASE TESTS PASSED!")
     print("==============================================")
