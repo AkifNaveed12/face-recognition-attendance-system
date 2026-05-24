@@ -14,7 +14,20 @@ app = FastAPI(title="Face Attendance System API")
 
 @app.on_event("startup")
 def on_startup():
-    create_tables()
+    print("[STARTUP] Starting FastAPI backend application...", flush=True)
+    try:
+        print("[STARTUP] Initializing SQLite database tables...", flush=True)
+        create_tables()
+        print("[STARTUP] Database tables initialized and seeded successfully.", flush=True)
+    except Exception as e:
+        print(f"[FATAL/STARTUP] Database initialization failed: {e}", flush=True)
+        print("[FATAL/STARTUP] Continuing application startup so health check/diagnostics are reachable.", flush=True)
+
+    print("[STARTUP] Registered API Routes:", flush=True)
+    for route in app.routes:
+        methods = getattr(route, "methods", None)
+        methods_str = ",".join(methods) if methods else "GET"
+        print(f"  {methods_str:10} {route.path}", flush=True)
 
 app.include_router(auth_router)
 app.include_router(students_router)
