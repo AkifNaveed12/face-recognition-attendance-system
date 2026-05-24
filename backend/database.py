@@ -36,6 +36,24 @@ def create_tables():
     """)
     
     conn.commit()
-    conn.close(
+
+    # Seed default credentials if database is empty (Task 6 & 7)
+    cursor.execute("SELECT COUNT(*) FROM students")
+    count = cursor.fetchone()[0]
+    if count == 0:
+        print("[INFO] Seeding default credentials...")
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
         
-    )
+        default_users = [
+            ("admin", "Admin User", "Administration", pwd_context.hash("admin123")),
+            ("CS001", "Test Student - Akif", "Computer Science", pwd_context.hash("password123")),
+            ("CS008", "Ahmad", "Computer Science", pwd_context.hash("AhmadCS008")),
+        ]
+        cursor.executemany(
+            "INSERT INTO students (student_id, name, department, password) VALUES (?, ?, ?, ?)",
+            default_users
+        )
+        conn.commit()
+
+    conn.close()

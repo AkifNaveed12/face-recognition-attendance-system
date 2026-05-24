@@ -20,17 +20,27 @@ router = APIRouter(
 # Device
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Load models ONCE
-mtcnn = MTCNN(
-    image_size=160,
-    margin=20,
-    keep_all=True,
-    device=device
-)
+_mtcnn = None
+_facenet = None
 
-facenet = InceptionResnetV1(
-    pretrained="vggface2"
-).eval().to(device)
+def get_mtcnn():
+    global _mtcnn
+    if _mtcnn is None:
+        _mtcnn = MTCNN(
+            image_size=160,
+            margin=20,
+            keep_all=True,
+            device=device
+        )
+    return _mtcnn
+
+def get_facenet():
+    global _facenet
+    if _facenet is None:
+        _facenet = InceptionResnetV1(
+            pretrained="vggface2"
+        ).eval().to(device)
+    return _facenet
 
 
 @router.post("/register")
@@ -48,6 +58,9 @@ async def register_student(
 
         image_bytes = await image.read()
         img = Image.open(BytesIO(image_bytes)).convert("RGB")
+
+        mtcnn = get_mtcnn()
+        facenet = get_facenet()
 
         faces = mtcnn(img)
         if faces is None or len(faces) == 0:
