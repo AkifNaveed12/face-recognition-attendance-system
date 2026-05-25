@@ -1,0 +1,21 @@
+# Render Blueprint — Infrastructure as Code
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: face-attendance-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-backend.txt
+    startCommand: uvicorn backend_api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHONPATH
+        value: .
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: SERVICE_API_KEY
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://face-recognition-attendance-system-jet.vercel.app
