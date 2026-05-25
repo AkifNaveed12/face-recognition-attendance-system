@@ -155,26 +155,7 @@ All secure endpoints utilize **JWT Bearer Authentication**.
 2. **Session Expiry Handling**: An Axios interceptor checks all client requests. If the API returns a `401 Unauthorized` (indicating the JWT token expired), the frontend automatically clears local storage and redirects the user to `/login?expired=true` showing a friendly banner.
 3. **Pydantic Validation**: All endpoints enforce strict data typing using Pydantic models. Malformed parameters return standard `422 Unprocessable Entity` structures.
 
----
 
-## ☁️ Cloud Deployment Configuration
-
-See the [Detailed Deployment Guide](docs/deployment-guide.md) for full instructions.
-
-### Backend (Railway or Render)
-- **Persistent Volume**: Since SQLite is local, configure a persistent volume mounted at `/app/database` (or your database directory) so the `attendance.db` data persists across restarts.
-- **Environment Variables**:
-  - `JWT_SECRET_KEY`: Secure 64-char key.
-  - `PYTHONPATH`: `.`
-- **Start Command**: `uvicorn backend_api.main:app --host 0.0.0.0 --port $PORT`
-
-### Frontend (Vercel)
-- **Build Settings**: Vite (React), Build command: `npm run build`, Output directory: `dist`.
-- **Environment Variables**:
-  - `VITE_API_URL`: Your deployed Render/Railway backend URL.
-- **Vercel Rewrites**: Handled dynamically in [vercel.json](frontend/vercel.json) to reroute wildcard paths to `index.html` (resolving client-side routing 404s on page refresh).
-
----
 
 ## 🧪 Automated Testing
 
