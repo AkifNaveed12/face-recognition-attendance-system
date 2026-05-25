@@ -1,0 +1,57 @@
+# ──────────────────────────────────────────────────────────────────
+# Backend API server dependencies (Render / cloud deployment)
+# ──────────────────────────────────────────────────────────────────
+# This file contains ONLY the packages needed to run the FastAPI
+# backend (auth, attendance CRUD, health check).  Heavy ML libs
+# (torch, facenet-pytorch, mediapipe, opencv) are excluded because:
+#   1. They consume >2 GB disk and >500 MB RAM at import time
+#   2. Render free tier has only 512 MB RAM
+#   3. Face registration (/students/register) requires these libs
+#      but is designed to run on a local edge machine, not in the
+#      cloud — the lazy-import pattern in students.py will print a
+#      clear error if someone tries to call it without them installed
+#
+# For local development with face registration support, use the
+# root requirements.txt instead:  pip install -r requirements.txt
+# ──────────────────────────────────────────────────────────────────
+
+# Web framework
+fastapi==0.128.0
+uvicorn==0.40.0
+starlette==0.50.0
+python-multipart==0.0.21
+
+# Auth & security
+passlib==1.7.4
+bcrypt==4.0.1
+python-jose==3.5.0
+cryptography==46.0.3
+
+# Data validation
+pydantic==2.12.5
+pydantic_core==2.41.5
+annotated-types==0.7.0
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+
+# Environment
+python-dotenv==1.2.2
+
+# HTTP / networking
+anyio==4.12.1
+h11==0.16.0
+requests==2.32.5
+certifi==2026.1.4
+charset-normalizer==3.4.4
+idna==3.11
+urllib3==2.6.3
+
+# Misc runtime deps
+click==8.3.1
+six==1.17.0
+pyasn1==0.6.2
+rsa==4.9.1
+ecdsa==0.19.1
+cffi==2.0.0
+pycparser==3.0
+packaging==26.0
