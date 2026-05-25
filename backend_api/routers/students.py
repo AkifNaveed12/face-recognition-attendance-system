@@ -1,9 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
-import torch
 import pickle
-from io import BytesIO
-from PIL import Image
-from facenet_pytorch import MTCNN, InceptionResnetV1
 from backend.database import get_connection
 import sqlite3
 import os
@@ -17,29 +13,45 @@ router = APIRouter(
     tags=["students"],
 )
 
-# Device
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# ── Lazy ML model loading ─────────────────────────────────────────
+# torch, facenet_pytorch, and PIL are NOT imported at module level.
+# On Render free tier (512 MB RAM), importing torch alone consumes
+# ~500 MB and causes an OOM kill before the server can bind to $PORT.
+# We defer all heavy imports into getter functions so the API boots
+# instantly with <50 MB RSS and only loads ML libs on first use
+# (i.e. when /students/register is actually called).
 
+_torch = None
 _mtcnn = None
 _facenet = None
+_device = None
+
+def _get_device():
+    global _device
+    if _device is None:
+        import torch
+        _device = "cuda" if torch.cuda.is_available() else "cpu"
+    return _device
 
 def get_mtcnn():
     global _mtcnn
     if _mtcnn is None:
+        from facenet_pytorch import MTCNN
         _mtcnn = MTCNN(
             image_size=160,
             margin=20,
             keep_all=True,
-            device=device
+            device=_get_device()
         )
     return _mtcnn
 
 def get_facenet():
     global _facenet
     if _facenet is None:
+        from facenet_pytorch import InceptionResnetV1
         _facenet = InceptionResnetV1(
             pretrained="vggface2"
-        ).eval().to(device)
+        ).eval().to(_get_device())
     return _facenet
 
 
@@ -53,6 +65,10 @@ async def register_student(
     admin_user: dict = Depends(require_admin)
 ):
     try:
+        import torch
+        from io import BytesIO
+        from PIL import Image
+
         from .auth import pwd_context
         hashed_password = pwd_context.hash(password)
 
@@ -66,6 +82,7 @@ async def register_student(
         if faces is None or len(faces) == 0:
             raise HTTPException(status_code=400, detail="No face detected")
 
+        device = _get_device()
         face = faces[0].unsqueeze(0).to(device)
 
         with torch.no_grad():
