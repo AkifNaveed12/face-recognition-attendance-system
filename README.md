@@ -1,492 +1,182 @@
-<div align="center">
-
 # 🧑‍🎓 Face Recognition Attendance Management System
 
-### 🚀 AI-Powered Smart Attendance Platform using Face Recognition & Liveness Detection
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-<p align="center">
-  <a href="https://fastapi.tiangolo.com/">
-    <img src="https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi" />
-  </a>
-
-<a href="https://react.dev/">
-    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
-  </a>
-
-<a href="https://www.typescriptlang.org/">
-    <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
-  </a>
-
-<a href="https://pytorch.org/">
-    <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" />
-  </a>
-
-<a href="https://tailwindcss.com/">
-    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
-  </a>
-
-<a href="https://vercel.com/">
-    <img src="https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel" />
-  </a>
-
-<a href="https://render.com/">
-    <img src="https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black" />
-  </a>
-</p>
+A state-of-the-art **Full-Stack Attendance Management System** leveraging **Facial Recognition** and **Liveness Detection** to automate student check-ins. Built with a high-performance FastAPI backend and a sleek, responsive React 19 + TypeScript dashboard.
 
 ---
 
-### 🌐 Live Deployment
+## 🌟 Key Features
 
-🚀 **Frontend:**
-https://face-recognition-attendance-system-jet.vercel.app/login
+### 👨‍🏫 Admin Portal
+*   **Real-time Dashboard**: Monitor student attendance with dynamic charts and live statistics.
+*   **Student Management**: Add, update, and manage student profiles with face registration.
+*   **History & Reports**: View detailed historical attendance logs and export reports to **CSV**.
+*   **Today's View**: Instantly see who is present or absent for the current day.
 
-⚙️ **Backend API:**
-https://face-recognition-attendance-system-il2q.onrender.com
+### 👨‍🎓 Student Portal
+*   **Attendance Statistics**: Students can track their overall attendance percentage and history.
+*   **Personal Dashboard**: A simplified, secure view for students to monitor their consistency.
 
-📦 **GitHub Repository:**
-https://github.com/AkifNaveed12/face-recognition-attendance-system
-
-</div>
-
----
-
-# 📌 Project Overview
-
-The **Face Recognition Attendance Management System** is a modern full-stack AI-powered web application designed to automate classroom attendance through:
-
-- 🧠 Real-time Facial Recognition
-- 👁️ Blink-based Liveness Detection
-- 🔐 JWT Authentication
-- 📊 Smart Admin & Student Dashboards
-- ☁️ Cloud Deployment Infrastructure
-- 📷 Webcam-based Attendance Monitoring
-
-The platform eliminates manual attendance processes, reduces proxy attendance fraud, and provides real-time attendance analytics through a secure and responsive web interface.
+### 📷 Smart Attendance Service
+*   **MTCNN & FaceNet**: High-accuracy face detection and embedding extraction using PyTorch.
+*   **Liveness Detection**: Integrated **blink detection** to prevent spoofing attacks (photos/videos).
+*   **Automatic Sync**: Seamlessly marks attendance via API calls once a match is confirmed.
 
 ---
 
-# ✨ Features
-
----
-
-## 👨‍🏫 Admin Portal
-
-### ✅ Dashboard Analytics
-
-- Real-time attendance monitoring
-- Attendance charts & statistics
-- Daily attendance insights
-- Student attendance tracking
-
-### ✅ Student Management
-
-- Register students with facial embeddings
-- Manage student profiles
-- Attendance history access
-- CSV report exporting
-
-### ✅ Security
-
-- JWT-based authentication
-- Role-protected routes
-- Secure API authorization
-
----
-
-## 👨‍🎓 Student Portal
-
-- Personal attendance dashboard
-- Attendance percentage tracking
-- Attendance history records
-- Secure student authentication
-
----
-
-## 🤖 AI Attendance Engine
-
-### 🧠 AI Recognition Pipeline
-
-- Face Detection using **MTCNN**
-- Face Embeddings using **FaceNet**
-- Cosine Similarity Matching
-
-### 👁️ Liveness Detection
-
-- Blink detection
-- Spoof prevention
-- Fake photo/video detection
-
-### ⚡ Real-Time Attendance
-
-- Automatic attendance marking
-- Backend synchronization
-- Live recognition pipeline
-
----
-
-# 🏗️ System Architecture
+## 🏗️ Architecture
 
 ```text
-┌──────────────────────────────┐
-│        React Frontend        │
-│ ──────────────────────────── │
-│ • Admin Dashboard            │
-│ • Student Dashboard          │
-│ • Attendance Charts          │
-│ • JWT Authentication         │
-└──────────────┬───────────────┘
-               │ HTTPS REST API
-               ▼
-┌──────────────────────────────┐
-│        FastAPI Backend       │
-│ ──────────────────────────── │
-│ • JWT Validation             │
-│ • Attendance APIs            │
-│ • Student Management         │
-│ • Embedding Storage          │
-│ • Role Authorization         │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│     Attendance AI Service    │
-│ ──────────────────────────── │
-│ • Webcam Stream              │
-│ • Face Detection             │
-│ • Face Recognition           │
-│ • Blink Verification         │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│        SQLite Database       │
-│ ──────────────────────────── │
-│ • Students                   │
-│ • Attendance Records         │
-│ • Face Embeddings            │
-└──────────────────────────────┘
+┌─────────────────────────────┐         ┌─────────────────────────────┐
+│      React Frontend         │         │      FastAPI Backend        │
+│  - Admin/Student Dashboards │ ◄─────► │  - JWT Authentication Guard │
+│  - CSV Exports & Recharts   │         │  - SQLite parameterization  │
+└─────────────────────────────┘         └──────────────┬──────────────┘
+                                                       │
+                                                       ▼
+┌─────────────────────────────┐         ┌─────────────────────────────┐
+│    Local Camera Service     │         │       SQLite Database       │
+│  - Webcam Face Detection    │ ◄─────► │  - 'students' & 'attendance'│
+│  - Blink Liveness check     │         │    tables with constraints  │
+└─────────────────────────────┘         └─────────────────────────────┘
 ```
 
 ---
 
-# 🧠 AI Models & Recognition Pipeline
+## 🛠️ Tech Stack
 
-| Component          | Technology                  |
-| ------------------ | --------------------------- |
-| Face Detection     | MTCNN                       |
-| Face Embeddings    | FaceNet / InceptionResnetV1 |
-| Embedding Dataset  | VGGFace2                    |
-| Face Matching      | Cosine Similarity           |
-| Liveness Detection | Eye Aspect Ratio (EAR)      |
+### 💻 Frontend
+*   **Framework**: React 19 (TypeScript)
+*   **Build Tool**: Vite
+*   **Styling**: Tailwind CSS
+*   **Visualization**: Recharts (React 19 compatible v3)
+*   **Networking**: Axios & React Router 7
 
----
+### ⚙️ Backend API
+*   **Framework**: FastAPI (Python 3.10+)
+*   **Auth**: JWT (OAuth2) with Password Hashing (passlib/bcrypt)
+*   **Database**: SQLite with parameterized queries.
 
-# 🛠️ Tech Stack
-
----
-
-## 💻 Frontend
-
-| Technology   | Purpose            |
-| ------------ | ------------------ |
-| React 19     | Frontend Framework |
-| TypeScript   | Type Safety        |
-| Vite         | Build Tool         |
-| Tailwind CSS | UI Styling         |
-| Axios        | API Communication  |
-| React Router | Routing            |
-| Recharts     | Analytics & Graphs |
+### 🧠 AI / Service Layer
+*   **Detection**: MTCNN (Multi-task Cascaded Convolutional Networks)
+*   **Embeddings**: InceptionResnetV1 (Pre-trained on VGGFace2)
+*   **Distance**: Cosine Similarity matching.
 
 ---
 
-## ⚙️ Backend
-
-| Technology     | Purpose          |
-| -------------- | ---------------- |
-| FastAPI        | Backend API      |
-| JWT            | Authentication   |
-| Pydantic       | Validation       |
-| SQLite         | Database         |
-| Passlib/Bcrypt | Password Hashing |
-
----
-
-## 🤖 AI / Computer Vision
-
-| Technology | Purpose                   |
-| ---------- | ------------------------- |
-| PyTorch    | Deep Learning             |
-| OpenCV     | Webcam Processing         |
-| MediaPipe  | Facial Landmark Detection |
-| MTCNN      | Face Detection            |
-| FaceNet    | Embedding Extraction      |
-
----
-
-## ☁️ Deployment & DevOps
-
-| Service               | Purpose                  |
-| --------------------- | ------------------------ |
-| Vercel                | Frontend Hosting         |
-| Render                | Backend Hosting          |
-| GitHub                | Version Control          |
-| Environment Variables | Secure Config Management |
-
----
-
-# 📂 Project Structure
+## 📂 Project Structure
 
 ```text
 face-recognition-attendance-system/
-│
-├── backend_api/
-│   ├── routers/
-│   ├── middleware/
-│   ├── models/
-│   └── main.py
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   ├── services/
-│   │   ├── hooks/
-│   │   └── utils/
-│   │
-│   ├── public/
-│   ├── vercel.json
-│   └── vite.config.ts
-│
-├── attendance_service/
-│   ├── recognition/
-│   ├── liveness/
-│   └── main.py
-│
-├── backend/
-├── database/
-├── docs/
-├── scratch/
-├── requirements.txt
-├── .python-version
-└── README.md
+├── backend_api/          # FastAPI main application & routers
+│   ├── routers/          # auth, students, and attendance endpoints
+│   └── main.py           # Application entry point
+├── frontend/             # React dashboard source code
+│   ├── src/              # Pages, components, services, and utils
+│   └── vercel.json       # SPA client-side routing config
+├── attendance_service/   # Real-time camera recognition & liveness logic
+├── backend/              # Database scripts and management helpers
+├── database/             # SQLite storage & database connection helpers
+├── docs/                 # Documentation (Roadmap, Deployment Guide, etc.)
+├── scratch/              # Integration and unit testing scripts
+└── requirements.txt      # Pinned python dependency configurations
 ```
 
 ---
 
-# 🔐 Authentication & Security
+## 🚀 Local Setup & Installation
 
-✅ JWT Bearer Authentication
-✅ Password Hashing with bcrypt
-✅ Protected API Routes
-✅ Role-Based Authorization
-✅ Production-safe CORS Configuration
-✅ Environment-based Secret Management
-✅ Internal Service API Key Validation
-
----
-
-# 📡 REST API Endpoints
-
-| Method | Endpoint              | Description                |
-| ------ | --------------------- | -------------------------- |
-| POST   | `/auth/login`         | User login                 |
-| POST   | `/auth/register`      | Register user              |
-| GET    | `/auth/me`            | Current authenticated user |
-| POST   | `/students/register`  | Register student           |
-| GET    | `/students/all`       | Get all students           |
-| GET    | `/attendance/today`   | Today's attendance         |
-| GET    | `/attendance/history` | Full attendance history    |
-| POST   | `/attendance/mark`    | Mark attendance            |
-
----
-
-# 🚀 Production Deployment
-
----
-
-## ⚙️ Backend Deployment — Render
-
-### Environment Variables
-
-```env
-JWT_SECRET_KEY=your_secret_key
-SERVICE_API_KEY=your_service_key
-FRONTEND_URL=https://face-recognition-attendance-system-jet.vercel.app
-PYTHONPATH=.
-```
-
-### Start Command
-
+### 1️⃣ Backend API Setup
+Navigate to the root directory and set up the Python environment:
 ```bash
-uvicorn backend_api.main:app --host 0.0.0.0 --port $PORT
-```
-
----
-
-## 💻 Frontend Deployment — Vercel
-
-### Environment Variables
-
-```env
-VITE_API_URL=https://face-recognition-attendance-system-il2q.onrender.com
-```
-
-### Build Configuration
-
-```bash
-npm run build
-```
-
-### Output Directory
-
-```text
-dist
-```
-
----
-
-# ⚙️ Local Development Setup
-
----
-
-## 1️⃣ Clone Repository
-
-```bash
-git clone https://github.com/AkifNaveed12/face-recognition-attendance-system.git
-
-cd face-recognition-attendance-system
-```
-
----
-
-## 2️⃣ Backend Setup
-
-```bash
+# Create and activate virtual environment
 python -m venv venv
+venv\Scripts\activate  # Windows
+# OR: source venv/bin/activate  # Linux/macOS
 
-# Windows
-venv\Scripts\activate
-
-# Install dependencies
+# Install pinned dependencies
 pip install -r requirements.txt
 
-# Start backend
-uvicorn backend_api.main:app --reload
+# Initialize the database
+python backend/init_db.py
+
+# Create a local .env file in root directory:
+# JWT_SECRET_KEY=generate_your_64_character_hex_string
+
+# Start the API server
+python -m uvicorn backend_api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
+*API runs at: `http://localhost:8000`*
 
-Backend runs at:
-
-```text
-http://localhost:8000
-```
-
----
-
-## 3️⃣ Frontend Setup
-
+### 2️⃣ Frontend Dashboard Setup
 ```bash
 cd frontend
-
 npm install
-
 npm run dev
 ```
+*Frontend runs at: `http://localhost:5173`*
 
-Frontend runs at:
-
-```text
-http://localhost:5173
-```
-
----
-
-## 4️⃣ Attendance Service
-
+### 3️⃣ Attendance Camera Service
+The camera service runs locally (e.g. at the classroom entrance) and communicates with the API.
 ```bash
+# In root directory with active venv:
 python attendance_service/main.py
 ```
 
 ---
 
-# 🧪 Major Production Challenges Solved
+## 🔑 REST API Endpoints & Authorization
 
-✅ MediaPipe Python Compatibility Issues
-✅ Vercel SPA Client-Side Routing
-✅ Production CORS Configuration
-✅ Environment-based API Configuration
-✅ Render Deployment Runtime Issues
-✅ Strict TypeScript Production Build Errors
-✅ Secure JWT & Service API Key Handling
+All secure endpoints utilize **JWT Bearer Authentication**.
 
----
-
-# 📈 Key Highlights
-
-- 🚀 Full-stack AI application
-- 🧠 Real-time face recognition
-- ☁️ Production cloud deployment
-- 🔐 JWT-secured architecture
-- 📊 Responsive admin dashboards
-- 👁️ Liveness detection integration
-- ⚡ Real-world deployment debugging
-- 🏗️ Distributed edge-AI architecture
+| Method | Endpoint | Access Level | Description |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/auth/login` | Public | Logs in a student/admin and returns JWT access token. |
+| **POST** | `/auth/register` | Admin Only | Registers standard users. |
+| **GET** | `/auth/me` | Authenticated | Decodes token to return authenticated user status. |
+| **POST** | `/students/register` | Admin Only | Registers a student profile along with face image multipart data. |
+| **GET** | `/students/all` | Admin Only | Returns details of all registered students. |
+| **GET** | `/students/{student_id}/embedding` | Admin Only | Extracts raw serialized facial vector for the student. |
+| **GET** | `/attendance/today` | Admin Only | List of all attendance entries logged for the current calendar date. |
+| **GET** | `/attendance/history` | Admin Only | Complete archive of historical attendance entries. |
+| **GET** | `/attendance/student/{id}/records` | Student / Admin | Fetches attendance logs filtered to a specific student ID. |
+| **POST** | `/attendance/mark` | Authenticated | Marks attendance for a student (called by the local webcam service). |
 
 ---
 
-# 🔮 Future Improvements
+## 🛠️ Edge-Case Exception Handling & Robustness
 
-- PostgreSQL Migration
-- Docker Containerization
-- Redis Caching
-- Multi-Camera Support
-- Mobile Application
-- Attendance Notifications
-- Kubernetes Deployment
-- Advanced Anti-Spoofing
+1. **Duplicate Registrations**: The backend catches `sqlite3.IntegrityError` raised by duplicate `student_id` database entries, returning a clean `400 Bad Request` instead of crashing.
+2. **Session Expiry Handling**: An Axios interceptor checks all client requests. If the API returns a `401 Unauthorized` (indicating the JWT token expired), the frontend automatically clears local storage and redirects the user to `/login?expired=true` showing a friendly banner.
+3. **Pydantic Validation**: All endpoints enforce strict data typing using Pydantic models. Malformed parameters return standard `422 Unprocessable Entity` structures.
 
----
 
-# 👨‍💻 Author
 
-<div align="center">
+## 🧪 Automated Testing
 
-## Muhammad Akif Naveed
+We maintain a thorough test suite. To execute automated verification, run:
 
-### Software Engineering Student • AI Enthusiast • Full-Stack Developer
+```bash
+# Run route protection tests
+python C:\Users\Admin\.gemini\antigravity\brain\248d2cbe-2c9f-43bd-86c8-ab15d4d151cf\scratch\test_route_protection.py
 
-<p align="center">
-  <a href="https://github.com/AkifNaveed12">
-    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github" />
-  </a>
-
-<a href="https://www.linkedin.com/in/akif-naveed/">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin" />
-  </a>
-
-<a href="https://portfolio-muhammad-akif-naveed.vercel.app/">
-    <img src="https://img.shields.io/badge/Portfolio-000000?style=for-the-badge&logo=vercel" />
-  </a>
-</p>
-
-</div>
+# Run integration and database edge case tests
+python scratch/test_integration_and_edge_cases.py
+```
 
 ---
 
-<div align="center">
-
-# ⭐ Project Status
-
-✅ Production Ready
-✅ Frontend Deployed
-✅ Backend Deployed
-✅ AI Recognition Integrated
-✅ JWT Authentication Working
-✅ Cloud Hosted
-✅ Portfolio Ready
+## 👨‍💻 Author
+**Akif Naveed**
+*Software Engineering Student | AI Enthusiast*
+- [LinkedIn](https://www.linkedin.com/in/akif-naveed/)
+- [GitHub](https://github.com/AkifNaveed12)
+- [Portfolio](https://portfolio-muhammad-akif-naveed.vercel.app/)
 
 ---
-
-### 🚀 Built with AI, Full-Stack Engineering & Computer Vision
-
-</div>
+*Maintained collaboratively for academic and enhancement purposes.*
