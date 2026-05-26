@@ -165,7 +165,7 @@ We maintain a thorough test suite. To execute automated verification, run:
 # Run route protection tests
 python C:\Users\Admin\.gemini\antigravity\brain\248d2cbe-2c9f-43bd-86c8-ab15d4d151cf\scratch\test_route_protection.py
 
-# Run integration and database edge case tests
+# Run integration and database edge case tests:
 python scratch/test_integration_and_edge_cases.py
 ```
 
